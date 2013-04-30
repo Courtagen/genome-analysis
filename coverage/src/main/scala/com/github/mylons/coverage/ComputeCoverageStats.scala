@@ -1,12 +1,14 @@
 package com.github.mylons.coverage
 
 import com.github.mylons.bed.BEDBuilder
+import com.github.mylons.bed.BED
 import collection.mutable.{ListBuffer, Map, HashMap}
-import io.Source
 import collection.mutable
-
-import com.codahale.jerkson.Json._
 import java.io.File
+
+
+import spray.json._
+import DefaultJsonProtocol._
 
 /**
  * Author: Mike Lyons
@@ -15,6 +17,26 @@ import java.io.File
  * Description: 
  */
 
+
+case class Target( name: String, beds: List[BED] )
+case class Summary()
+
+class ComputeCoverageStats2( targetsFile: String, coverageFile: String, outputFile: String ) {
+
+  //setup
+  private val targetBeds = new BEDBuilder(targetsFile).fromExonBed
+
+  //sets up a map of Gene -> List of beds
+  val genes = targetBeds.groupBy( _.namedFields("targetName").toString )
+
+  private val covBeds = new BEDBuilder(coverageFile).fromCoverageBed
+  val c = covBeds(0).namedFields("targetRelativeOffset")
+
+
+  //val coverage = covBeds.groupBy( _namedFields("targetName").toString )
+
+
+}
 class ComputeCoverageStats( inputFile: String, outputFile: String ) {
 
   /*def testJson() = {
@@ -65,23 +87,27 @@ class ComputeCoverageStats( inputFile: String, outputFile: String ) {
       jsonSummary.put(bed.namedFields("targetName").toString, new mutable.HashMap[String, Map[String, Double]]() )
     }
 
+    //see if this target range is in the map of ranges, add if necessary
     val coordString = "%d-%d" format(bed.start, bed.stop)
     if ( !jsonSummary(bed.namedFields("targetName").toString ).contains(coordString) ) {
       jsonSummary(bed.namedFields("targetName").toString).put(coordString, initTarget())
     }
-
-
+    //not sure what this is doing
     if (!superTargetLengthMap.contains( bed.namedFields("targetName").toString ) ) {
       superTargetLengthMap.put(bed.namedFields("targetName").toString, ListBuffer[Double]() )
     }
+    // add target length if we haven't seen this target range before
     if (!targetLengthMap.contains(bed.hashString) ) {
       superTargetLengthMap( bed.namedFields("targetName").toString ) += (bed.stop - bed.start)
     }
-
+    //add to individual target length map too
     if ( !targetLengthMap.contains(bed.hashString) )
       targetLengthMap.put( bed.hashString, (bed.stop - bed.start ) )
+
+    //add to list of targets
     if (!targetMap.contains(bed.hashString))
       targetMap.put(bed.hashString, initTarget() )
+
     if (bed.depth >= 1 ){
       targetMap(bed.hashString)("C1 depth") += 1
       jsonSummary(bed.namedFields("targetName").toString)(coordString)("C1 depth") += 1
@@ -154,7 +180,9 @@ class ComputeCoverageStats( inputFile: String, outputFile: String ) {
     jsonSummary("combined")("overall")(order.replace("depth", "ratio")) = (totalTarget(order).toDouble / totalLength.toDouble)
   }
   println(sb.mkString)
-  println(generate(jsonSummary, new File(outputFile) ) )
+  //println(generate(jsonSummary, new File(outputFile) ) )
+  //println(jsonSummary.mkString)
+  //println(jsonSummary.toJson.prettyPrint)
 }
 
 object ComputeCoverageStats extends App {

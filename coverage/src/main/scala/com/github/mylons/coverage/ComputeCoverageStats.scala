@@ -9,6 +9,7 @@ import java.io.File
 
 import spray.json._
 import DefaultJsonProtocol._
+import com.github.mylons.coverage.ComputeCoverageStats
 
 /**
  * Author: Mike Lyons

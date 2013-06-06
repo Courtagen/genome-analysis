@@ -2,6 +2,8 @@ package com.github.mylons.sam.util
 
 import java.io.File
 import net.sf.samtools.{SAMFileWriterFactory, SAMFileSpan, SAMFileReader}
+import com.github.mylons.sam.util.SelectReads
+
 /**
  * Author: Mike Lyons
  * Date: 3/25/13

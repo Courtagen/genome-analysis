@@ -2,7 +2,7 @@ import AssemblyKeys._
 
 assemblySettings
 
-assemblyCacheOutput in assembly := false
+//assemblyCacheOutput in assembly := false
 
 organization := "com.github.mylons"
 
@@ -30,4 +30,12 @@ libraryDependencies ++= Seq (
         "org.apache.logging.log4j" % "log4j-core" % "2.0-beta4",
         "io.spray" %%  "spray-json" % "1.2.3" 
 )
+
+mainClass in (Compile, packageBin) := Some("com.github.mylons.coverage.ComputeCoverageStats")
+
+mainClass in (Compile, run) := Some("com.github.mylons.coverage.ComputeCoverageStats")
+
+mainClass in assembly := Some("com.github.mylons.coverage.ComputeCoverageStats")
+
+jarName in assembly := "genome-analysis.jar"
 
